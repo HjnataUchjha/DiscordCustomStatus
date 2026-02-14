@@ -1,16 +1,10 @@
-﻿namespace DiscordCustomStatus.AppConfig
+﻿namespace DiscordCustomStatus.WebApi.Api.Models
 {
-    public class AppConfig
+    public class ConfigEditModel
     {
-        public Guid? CurrentDcsConfigId { get; set; }
-        public List<DcsConfig> DcsConfigs { get; init; }
-    }
+        public Guid? Id { get; set; }
 
-    public class DcsConfig
-    {
-        public Guid Id { get; set; }
         public string Name { get; set; }
-
         public string ApiKey { get; set; }
         public string GameDetails { get; set; }
         public string State { get; set; }

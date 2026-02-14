@@ -38,7 +38,10 @@ namespace DiscordCustomStatus.AppConfig
             }
             catch
             {
-                _config = new AppConfig();
+                _config = new AppConfig
+                {
+                    DcsConfigs = []
+                };
             }
         }
 

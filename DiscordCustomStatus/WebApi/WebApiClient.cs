@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
 
 namespace DiscordCustomStatus.WebApi
 {
@@ -16,15 +16,20 @@ namespace DiscordCustomStatus.WebApi
             {
                 Port = port
             });
+            builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
+            app.UseStaticFiles();
+
             app.UseSwagger();
             app.UseSwaggerUI();
 
             app.MapControllers();
+
+            LastPort = port;
 
             Task.Run(() =>
             {
@@ -33,6 +38,8 @@ namespace DiscordCustomStatus.WebApi
 
             return app;
         }
+
+        public static int LastPort { get; private set; }
 
         private static int GetFreePort()
         {
