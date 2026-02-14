@@ -20,8 +20,9 @@ namespace DiscordCustomStatus.Tray
             return trayIcon;
         }
 
-        public static void RunDiscordRpcClient(this ContextMenuStrip menu, DiscordRpcClient client)
+        public static void RunDiscordRpcClient(this NotifyIcon notifyIcon, DiscordRpcClient client)
         {
+            var menu = notifyIcon.ContextMenuStrip;
             var runItem = new ToolStripMenuItem("Запустить");
             var stopItem = new ToolStripMenuItem("Остановить") { Visible = false };
 
@@ -50,6 +51,14 @@ namespace DiscordCustomStatus.Tray
                 try
                 {
                     client?.Dispose();
+
+                    var config = AppConfigHelper.Config.DcsConfigs.First(x => x.Id == AppConfigHelper.Config.CurrentDcsConfigId);
+                    notifyIcon.ShowBalloonTip(
+                        3000,
+                        "Discord Custom Status",
+                        $"<{config.Name}> остановлен",
+                        ToolTipIcon.Info
+                    );
                 }
                 catch { }
                 client = null;
@@ -86,6 +95,12 @@ namespace DiscordCustomStatus.Tray
                                 SmallImageText = config.ImageText
                             }
                         });
+                        notifyIcon.ShowBalloonTip(
+                            3000,
+                            "Discord Custom Status",
+                            $"<{config.Name}> запущен",
+                            ToolTipIcon.Info
+                        );
                     }
                     catch { }
                 };

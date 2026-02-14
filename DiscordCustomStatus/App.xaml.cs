@@ -21,7 +21,7 @@ namespace DiscordCustomStatus
 
             _trayIcon = TrayIconClient.StartTray();
             _trayIcon.ContextMenuStrip.AddCurrentConfigLabel();
-            _trayIcon.ContextMenuStrip.RunDiscordRpcClient(_client);
+            _trayIcon.RunDiscordRpcClient(_client);
             _trayIcon.ContextMenuStrip.AddSettingsButton(port);
             _trayIcon.ContextMenuStrip.AddShutdownBotton(() => Shutdown());
             //_trayIcon.ContextMenuStrip.AddSwaggerBotton(port);
