@@ -71,7 +71,7 @@
 		if (id) {
 			setTitle(true);
 			try {
-				const res = await fetch(apiBase + '/config/' + encodeURIComponent(id));
+				const res = await fetch(apiBase + '/config/' + encodeURIComponent(id), { headers: { 'X-Api-Key': 'discord-custom-status' } });
 				if (!res.ok) throw new Error('HTTP ' + res.status);
 				const m = await res.json();
 				// fill fields using flexible property access
@@ -108,7 +108,7 @@
 		try {
 			const res = await fetch(apiBase + '/config', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: { 'Content-Type': 'application/json', 'X-Api-Key': 'discord-custom-status' },
 				body: JSON.stringify(model)
 			});
 			if (!res.ok) throw new Error('HTTP ' + res.status);

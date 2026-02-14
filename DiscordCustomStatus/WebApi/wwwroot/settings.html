@@ -43,7 +43,7 @@
 
         async function loadConfigs() {
             try {
-                const res = await fetch(apiBase + '/configs');
+                const res = await fetch(apiBase + '/configs', { headers: { 'X-Api-Key': 'discord-custom-status' } });
                 if (!res.ok) 
                 {
                     throw new Error('HTTP ' + res.status);
@@ -108,7 +108,7 @@
                         return;
                     }
                     try {
-                        const dres = await fetch(apiBase + '/config/' + itemId, { method: 'DELETE' });
+                        const dres = await fetch(apiBase + '/config/' + itemId, { method: 'DELETE', headers: { 'X-Api-Key': 'discord-custom-status' } });
                         if (!dres.ok)
                         {
                             throw new Error('HTTP ' + dres.status);
@@ -155,7 +155,7 @@
                 return;   
             }
             try {
-                const res = await fetch(apiBase + '/set-current-config/' + selectedId, { method: 'POST' });
+                const res = await fetch(apiBase + '/set-current-config/' + selectedId, { method: 'POST', headers: { 'X-Api-Key': 'discord-custom-status' } });
                 if (!res.ok) 
                 {
                     throw new Error('HTTP ' + res.status);
