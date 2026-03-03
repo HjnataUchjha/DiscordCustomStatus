@@ -7,6 +7,7 @@ OutputDir=../Realises
 OutputBaseFilename=Setup
 Compression=lzma
 SolidCompression=yes
+AppPublisher=Hjnata Uchjha
 
 [Files]
 Source: "bin\Release\net8.0-windows\win-x64\publish\DiscordCustomStatus.exe"; DestDir: "{app}"; Flags: ignoreversion
