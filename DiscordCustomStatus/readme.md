@@ -1,0 +1,1 @@
+powershell.exe -Command "dotnet publish .\DiscordCustomStatus.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:InvariantGlobalization=true"

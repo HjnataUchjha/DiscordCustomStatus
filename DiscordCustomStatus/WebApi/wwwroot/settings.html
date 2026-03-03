@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Настройки</title>
+    <style>
+        body { font-family: Segoe UI, Arial; margin: 20px }
+        button { padding: 8px 12px }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left }
+        tr.selected { background: #e6f7ff }
+        .actions button { margin-right: 6px }
+        .topbar { display:flex; gap:8px; align-items:center }
+    </style>
+	<link rel="icon" href="/favicon.png" type="image/png" />
+</head>
+<body>
+    <h1>Настройки</h1>
+    <h2 id="currentSubtitle">Текущий конфиг: </h2>
+
+    <div class="topbar">
+      <button id="newBtn">Создать новый конфиг</button>
+      <button id="setCurrentBtn" disabled>Установить как текущий</button>
+    </div>
+
+    <div style="margin-top: 10px">Выберите конфиг для установки как текущий</div>
+
+    <table id="configsTable">
+        <thead>
+            <tr>
+                <th style="width:220px">Действия</th>
+                <th>Название</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const apiBase = '/api/DcsConfig';
+        let model = null;
+        let selectedId = null;
+
+        async function loadConfigs() {
+            try {
+                const res = await fetch(apiBase + '/configs', { headers: { 'X-Api-Key': 'discord-custom-status' } });
+                if (!res.ok) 
+                {
+                    throw new Error('HTTP ' + res.status);
+                }
+                model = await res.json();
+                renderList();
+            } catch (e) {
+                alert('Ошибка при загрузке: ' + e);
+            }
+        }
+
+        function renderList() {
+            const tbody = document.querySelector('#configsTable tbody');
+            tbody.innerHTML = '';
+
+            const items = (model && (model.SelectItems || model.selectItems)) || [];
+            const currentId = (model && (model.CurrentId || model.currentId)) || null;
+
+            function prop(obj, name) {
+                if (!obj) 
+                {
+                    return undefined;
+                }
+                return obj[name] ?? obj[name.charAt(0).toLowerCase() + name.slice(1)];
+            }
+
+            const current = items.find(x => prop(x, 'Id') === currentId || prop(x, 'Id') === String(currentId));
+            document.getElementById('currentSubtitle').textContent = 'Текущий конфиг: ' + (current ? prop(current, 'Name') : '');
+
+            for (const it of items) {
+                const itemId = prop(it, 'Id');
+                const itemName = prop(it, 'Name');
+
+                const tr = document.createElement('tr');
+                tr.dataset.id = itemId;
+
+                tr.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'BUTTON')
+                    {
+                        return;
+                    }
+                    selectRow(itemId, tr);
+                });
+
+                const tdName = document.createElement('td');
+                tdName.textContent = itemName;
+
+                const tdActions = document.createElement('td');
+                tdActions.className = 'actions';
+
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Редактировать';
+                editBtn.addEventListener('click', () => {
+                    location.href = 'update.html?id=' + encodeURIComponent(itemId);
+                });
+
+                const delBtn = document.createElement('button');
+                delBtn.textContent = 'Удалить';
+                delBtn.addEventListener('click', async () => {
+                    if (!confirm('Удалить конфиг "' + itemName + '"?'))
+                    {
+                        return;
+                    }
+                    try {
+                        const dres = await fetch(apiBase + '/config/' + itemId, { method: 'DELETE', headers: { 'X-Api-Key': 'discord-custom-status' } });
+                        if (!dres.ok)
+                        {
+                            throw new Error('HTTP ' + dres.status);
+                        }
+                        await loadConfigs();
+                        if (selectedId === itemId) 
+                        {
+                            clearSelection();
+                        }
+                    } catch (e) {
+                        alert('Ошибка при удалении: ' + e);
+                    }
+                });
+
+                tdActions.appendChild(editBtn);
+                tdActions.appendChild(delBtn);
+
+                tr.appendChild(tdActions);
+                tr.appendChild(tdName);
+                tbody.appendChild(tr);
+            }
+        }
+
+        function selectRow(id, tr) {
+            clearSelection();
+            selectedId = id;
+            tr.classList.add('selected');
+            document.getElementById('setCurrentBtn').disabled = false;
+        }
+
+        function clearSelection() {
+            selectedId = null;
+            document.querySelectorAll('#configsTable tr.selected').forEach(r => r.classList.remove('selected'));
+            document.getElementById('setCurrentBtn').disabled = true;
+        }
+
+        document.getElementById('newBtn').addEventListener('click', () => {
+            location.href = 'update.html';
+        });
+
+        document.getElementById('setCurrentBtn').addEventListener('click', async () => {
+            if (!selectedId) 
+            {
+                return;   
+            }
+            try {
+                const res = await fetch(apiBase + '/set-current-config/' + selectedId, { method: 'POST', headers: { 'X-Api-Key': 'discord-custom-status' } });
+                if (!res.ok) 
+                {
+                    throw new Error('HTTP ' + res.status);
+                }
+                clearSelection();
+                await loadConfigs();
+            } catch (e) {
+                alert('Ошибка при установке: ' + e);
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', loadConfigs);
+    </script>
+</body>
+</html>

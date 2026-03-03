@@ -1,31 +1,36 @@
-﻿using System.IO;
-using System.Text.Json;
+﻿using DiscordCustomStatus.Tray;
+using DiscordCustomStatus.WebApi;
+using DiscordRPC;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
+using Application = System.Windows.Application;
 
 namespace DiscordCustomStatus
 {
     public partial class App : Application
     {
-        public static AppConfig Config { get; private set; }
-        private const string configFilePath = "appsettings.json";
+        private NotifyIcon _trayIcon;
+        private WebApplication _webApp;
+        private DiscordRpcClient _client;
 
-        protected override void OnStartup(StartupEventArgs e)
+        private void Application_Startup(object sender, StartupEventArgs e)
         {
-            base.OnStartup(e);
-            ReadConfig();
+            _webApp = WebApiClient.StartWebApi();
+            var port = _webApp.Services.GetRequiredService<WebApiConfig>().Port;
+
+            _trayIcon = TrayIconClient.StartTray();
+            _trayIcon.ContextMenuStrip.AddCurrentConfigLabel();
+            _trayIcon.RunDiscordRpcClient(_client);
+            _trayIcon.ContextMenuStrip.AddSettingsButton(port);
+            _trayIcon.ContextMenuStrip.AddShutdownBotton(() => Shutdown());
         }
 
-        public static void ReadConfig()
+        private void Application_Exit(object sender, ExitEventArgs e)
         {
-            var json = File.ReadAllText(configFilePath);
-            Config = JsonSerializer.Deserialize<AppConfig>(json);
-        } 
-
-        public static void SaveConfig()
-        {
-            var json = JsonSerializer.Serialize(Config, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(configFilePath, json);
+            _trayIcon.Visible = false;
+            _trayIcon.Dispose();
+            _webApp?.DisposeAsync();
         }
     }
-
 }

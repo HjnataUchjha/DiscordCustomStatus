@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Редактировать/Создать конфиг</title>
+	<style>
+		body { font-family: Segoe UI, Arial; margin: 20px }
+		label { display:block; margin-top:10px }
+		input[type=text], textarea { width:100%; padding:6px; box-sizing:border-box }
+		.row { max-width:800px }
+		.buttons { margin-top:12px }
+		button { padding:8px 12px }
+	</style>
+	<link rel="icon" href="/favicon.png" type="image/png" />
+</head>
+<body>
+	<h1 id="pageTitle">Загрузка...</h1>
+
+	<div class="row">
+		<input type="hidden" id="cfgId" />
+
+		<label>Название
+			<input type="text" id="name" />
+		</label>
+
+		<label>ApiKey
+			<input type="text" id="apiKey" />
+		</label>
+		<div>
+			<i><a href="https://discord.com/developers/applications">Открыть Discord Developer Applications</a></i>
+		</div>
+
+		<label>Детали
+			<textarea id="gameDetails" rows="3"></textarea>
+		</label>
+
+		<label>Состояние
+			<input type="text" id="state" />
+		</label>
+
+		<label>Иконка
+			<input type="text" id="imageKey" />
+		</label>
+
+		<label>Описание иконки
+			<input type="text" id="imageText" />
+		</label>
+
+		<div class="buttons">
+			<button id="saveBtn">Сохранить</button>
+			<button id="backBtn" type="button">Назад</button>
+		</div>
+	</div>
+
+	<script>
+	const apiBase = '/api/DcsConfig';
+	const params = new URLSearchParams(location.search);
+	const id = params.get('id');
+
+	function setTitle(editing) {
+		document.getElementById('pageTitle').textContent = editing ? 'Редактирование конфига' : 'Создать новый конфиг';
+	}
+
+	function prop(obj, name) {
+		if (!obj) return undefined;
+		return obj[name] ?? obj[name.charAt(0).toLowerCase() + name.slice(1)];
+	}
+
+	async function loadIfNeeded() {
+		if (id) {
+			setTitle(true);
+			try {
+				const res = await fetch(apiBase + '/config/' + encodeURIComponent(id), { headers: { 'X-Api-Key': 'discord-custom-status' } });
+				if (!res.ok) throw new Error('HTTP ' + res.status);
+				const m = await res.json();
+				// fill fields using flexible property access
+				document.getElementById('cfgId').value = prop(m, 'Id') || '';
+				document.getElementById('name').value = prop(m, 'Name') || '';
+				document.getElementById('apiKey').value = prop(m, 'ApiKey') || '';
+				document.getElementById('gameDetails').value = prop(m, 'GameDetails') || '';
+				document.getElementById('state').value = prop(m, 'State') || '';
+				document.getElementById('imageKey').value = prop(m, 'ImageKey') || '';
+				document.getElementById('imageText').value = prop(m, 'ImageText') || '';
+			} catch (e) {
+				alert('Ошибка при загрузке: ' + e);
+			}
+		} else {
+			setTitle(false);
+		}
+	}
+
+	document.getElementById('backBtn').addEventListener('click', () => {
+		location.href = 'settings.html';
+	});
+
+	document.getElementById('saveBtn').addEventListener('click', async () => {
+		const model = {
+			Id: id ? document.getElementById('cfgId').value || id : null,
+			Name: document.getElementById('name').value,
+			ApiKey: document.getElementById('apiKey').value,
+			GameDetails: document.getElementById('gameDetails').value,
+			State: document.getElementById('state').value,
+			ImageKey: document.getElementById('imageKey').value,
+			ImageText: document.getElementById('imageText').value
+		};
+
+		try {
+			const res = await fetch(apiBase + '/config', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json', 'X-Api-Key': 'discord-custom-status' },
+				body: JSON.stringify(model)
+			});
+			if (!res.ok) throw new Error('HTTP ' + res.status);
+			// on success go back
+			location.href = 'settings.html';
+		} catch (e) {
+			alert('Ошибка при сохранении: ' + e);
+		}
+	});
+
+	window.addEventListener('DOMContentLoaded', loadIfNeeded);
+	</script>
+</body>
+</html>
