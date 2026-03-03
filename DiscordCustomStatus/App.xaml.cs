@@ -24,7 +24,6 @@ namespace DiscordCustomStatus
             _trayIcon.RunDiscordRpcClient(_client);
             _trayIcon.ContextMenuStrip.AddSettingsButton(port);
             _trayIcon.ContextMenuStrip.AddShutdownBotton(() => Shutdown());
-            //_trayIcon.ContextMenuStrip.AddSwaggerBotton(port);
         }
 
         private void Application_Exit(object sender, ExitEventArgs e)

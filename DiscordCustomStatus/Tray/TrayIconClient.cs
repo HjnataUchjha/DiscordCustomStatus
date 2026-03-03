@@ -139,18 +139,6 @@ namespace DiscordCustomStatus.Tray
             });
         }
 
-        public static void AddSwaggerBotton(this ContextMenuStrip menu, int port)
-        {
-            menu.Items.Add("Swagger", null, (_, _) =>
-            {
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = $"http://localhost:{port}/swagger",
-                    UseShellExecute = true
-                });
-            });
-        }
-
         public static void AddSettingsButton(this ContextMenuStrip menu, int port)
         {
             menu.Items.Add("Настройки", null, (_, _) =>

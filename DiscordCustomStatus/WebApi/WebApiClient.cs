@@ -26,25 +26,15 @@ namespace DiscordCustomStatus.WebApi
             });
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
             app.UseStaticFiles();
 
-            app.UseSwagger();
-            app.UseSwaggerUI();
-
             app.MapControllers();
 
             app.Use(async (ctx, next) =>
             {
-                if (ctx.Request.Path.StartsWithSegments("/swagger"))
-                {
-                    await next();
-                    return;
-                }
-
                 if (!ctx.Request.Headers.TryGetValue("X-Api-Key", out var token) ||
                     token != ApiToken)
                 {

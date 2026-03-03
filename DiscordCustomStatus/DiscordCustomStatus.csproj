@@ -7,23 +7,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+	<ApplicationIcon>Imgs/Icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="DiscordRichPresence" Version="1.6.1.70" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.1.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.1.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Imgs\Icon.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +24,22 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <Link>wwwroot\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Imgs\exeIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Imgs\exeIcon.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Imgs\Icon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
